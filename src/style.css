@@ -49,3 +49,14 @@ html:not(.touch-game) .touch{display:none!important}
 .overlay .card .hint{margin-inline:auto;line-height:1.6}
 .overlay .card #camera-settings{width:100%;text-align:left}
 @media(max-width:700px) and (orientation:portrait),(pointer:coarse) and (orientation:portrait){.overlay{background:linear-gradient(180deg,#fff0dbed,#fff0dbe0 72%,#23442499)}.overlay .card{margin:auto}}
+
+.creator-credit{position:fixed;right:18px;bottom:max(9px,env(safe-area-inset-bottom));font-size:11px;letter-spacing:.4px;color:#fff4d2;text-shadow:0 1px 3px #153f43;z-index:5;pointer-events:none}
+footer .ancestral-tagline{position:absolute;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;font-size:10px;letter-spacing:2px}
+footer .ancestral-tagline::after{content:none!important}
+html.touch-game footer .ancestral-tagline{font-size:10px}
+html:has(.overlay:not(.hidden)) footer{justify-content:center}
+html:has(.overlay:not(.hidden)) footer>div{display:none}
+html:has(.overlay:not(.hidden)) footer .ancestral-tagline{position:static;transform:none;display:block;width:100%;text-align:center;color:#143f43;text-shadow:0 1px 3px #fff8}
+@media(max-width:700px){.creator-credit{font-size:10px;right:12px}footer .ancestral-tagline{letter-spacing:1.4px;font-size:9px}}
+
+footer{z-index:4;pointer-events:none}

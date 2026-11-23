@@ -1,5 +1,9 @@
 # Wakalito Running · edición web
 
+**[Jugar Wakalito Running](https://mrtronch.github.io/wakalito-running/)** · by Mr Tronch
+
+[Repositorio del proyecto](https://github.com/MrTronch/wakalito-running)
+
 Endless runner 3D de Ancestralia. Edición pública con teclado y controles táctiles, sin cámara ni MediaPipe. Los modelos 3D y texturas forman parte del proyecto; los efectos se sintetizan localmente con Web Audio. No requiere servidor de aplicación ni servicios externos.
 
 ## Iniciar
@@ -20,16 +24,20 @@ npm run dev
 - El sonido comienza después de tocar o pulsar una tecla. Incluye el loop ambiental original, que se pausa al pausar o perder.
 - Se adapta también a horizontal, sin obligar al navegador a bloquear la orientación.
 
-## Publicar hoy en GitHub Pages
+## Publicar en GitHub Pages (método recomendado)
 
-1. Usa todos los archivos de la carpeta `GitHub` preparada junto al proyecto local, incluida `.github`. También puedes usar el contenido de `wakalito-github-sin-camara.zip`. Descomprime el ZIP y sube **su contenido**, no el ZIP, a la raíz de un repositorio público. Incluye la carpeta oculta `.github`.
-2. En GitHub, abre **Settings → Pages → Source → GitHub Actions**.
-3. Sube los cambios a la rama `main`, o ejecuta el flujo desde **Actions → Publicar Wakalito Running → Run workflow**.
-4. Espera a que finalice. La dirección del juego aparece en Pages y en el despliegue de Actions.
+1. Sube el contenido actualizado de la carpeta `GitHub` a la raíz del repositorio, incluida la carpeta **docs**. Sustituye los archivos anteriores.
+2. Abre **Settings → Pages → Build and deployment → Source → Deploy from a branch**.
+3. Selecciona **main** y **/docs**. Pulsa **Save**.
+4. Espera a que termine el despliegue y abre https://mrtronch.github.io/wakalito-running/ . Recarga la página para evitar la copia anterior en caché.
 
-El archivo `wakalito-web-sin-camara.zip` contiene solamente el sitio ya compilado; sirve para un alojamiento estático. El ZIP de GitHub incluye fuentes y el flujo de publicación, que construye el sitio automáticamente. Las rutas relativas admiten un repositorio bajo `usuario.github.io/nombre-del-repositorio/`.
+`docs/` contiene el sitio ya compilado: HTML, estilos, JavaScript, logo, modelos y sonidos. No abras la raíz del código fuente como sitio estático: ese `index.html` necesita Vite. La ruta correcta para Pages con este método es `/docs`, no `/(root)`.
 
-No subas `node_modules`, `.npm-cache`, `dist`, ejecutables, Blender ni la carpeta local completa. Este paquete ya los excluye, al igual que todo el código y los modelos de cámara. Los cambios de esta edición no publican nada automáticamente desde el equipo local.
+El fallo anterior ocurría porque Pages servía directamente el HTML fuente, que pedía `/src/main.js`; el logo estaba en `public/` y tampoco correspondía a la ruta pública. Además faltaba `.github/workflows/pages.yml` en el repositorio subido, por lo que no se ejecutaba la compilación automática.
+
+Como alternativa, puedes subir la carpeta oculta `.github` y elegir **GitHub Actions** como Source: el flujo compila y publica automáticamente. Usa uno de los dos métodos.
+
+Esta edición no contiene cámara ni MediaPipe. No subas dependencias instaladas, cachés, ejecutables ni archivos Blender. El enlace del README será jugable cuando el despliegue termine correctamente.
 
 ## Compatibilidad y rendimiento
 
