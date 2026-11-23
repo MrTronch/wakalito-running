@@ -1,0 +1,18 @@
+{
+  "name": "wakalito-running",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --mode public",
+    "build": "vite build --mode public",
+    "preview": "vite preview --host 127.0.0.1 --mode public",
+    "test": "node --test --test-isolation=none"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "vite": "7.1.7"
+  }
+}
