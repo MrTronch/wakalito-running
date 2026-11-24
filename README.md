@@ -20,6 +20,7 @@ npm run dev
 ## Controles
 
 - Escritorio: Espacio/arriba para saltar; abajo/S para agacharse mientras se mantiene la tecla; P para pausa.
+- Al perder, el menú espera medio segundo antes de habilitar el reinicio para evitar toques accidentales.
 - Móvil: pantalla vertical; toca SALTAR o RODAR. Cada toque de RODAR completa una vuelta. Se puede pausar y silenciar desde los botones superiores.
 - El sonido comienza después de tocar o pulsar una tecla. Incluye el loop ambiental original, que se pausa al pausar o perder.
 - Se adapta también a horizontal, sin obligar al navegador a bloquear la orientación.

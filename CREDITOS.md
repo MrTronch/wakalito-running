@@ -8,3 +8,5 @@
 - Vite 7.1.7: MIT, https://github.com/vitejs/vite/blob/v7.1.7/LICENSE .
 
 El loop ambiental se reproduce durante la partida. No se incluye cámara, captura de vídeo, MediaPipe ni subida de imágenes en la edición pública.
+
+- Montserrat variable: Google Fonts / autores de Montserrat, SIL Open Font License; licencia incluida en `public/fonts/OFL-Montserrat.txt`. Gotham se utiliza si está disponible en el dispositivo; no se redistribuye una copia sin licencia.

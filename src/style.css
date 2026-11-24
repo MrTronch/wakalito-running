@@ -60,3 +60,12 @@ html:has(.overlay:not(.hidden)) footer .ancestral-tagline{position:static;transf
 @media(max-width:700px){.creator-credit{font-size:10px;right:12px}footer .ancestral-tagline{letter-spacing:1.4px;font-size:9px}}
 
 footer{z-index:4;pointer-events:none}
+
+@font-face{font-family:Montserrat;src:url('../public/fonts/Montserrat-Variable.ttf') format('truetype');font-weight:100 900;font-style:normal;font-display:swap}
+body,button,input,select,kbd{font-family:Gotham,Montserrat,Arial,sans-serif}button{font-weight:700}.title{font-weight:800}.hud strong{font-weight:800}.card h1{font-weight:800}.hint,.card p{font-weight:400}.hud b{font-weight:600}footer{font-weight:500}
+@media(max-width:700px) and (orientation:portrait),(pointer:coarse) and (orientation:portrait){html.touch-game .touch{bottom:max(62px,calc(env(safe-area-inset-bottom) + 7vh))}html.touch-game .touch button{height:90px}html.touch-game .touch button b{font-weight:700}html.touch-game .hud strong{font-weight:800}html.touch-game footer{bottom:max(26px,calc(env(safe-area-inset-bottom) + 18px))}}
+@media(max-height:650px) and (orientation:portrait){html.touch-game .touch{bottom:max(56px,calc(env(safe-area-inset-bottom) + 40px))}html.touch-game .touch button{height:78px}}
+
+header .title{font-size:17px;letter-spacing:1px;text-transform:uppercase}header .title small{letter-spacing:2px}
+.card .game-name{display:block;font-size:52px;line-height:1.05;letter-spacing:-1px}
+@media(max-width:700px) and (orientation:portrait),(pointer:coarse) and (orientation:portrait){header .title{font-size:clamp(15px,4.3vw,21px);letter-spacing:1px}.card .game-name{font-size:36px}}

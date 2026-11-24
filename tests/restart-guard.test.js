@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {RestartGuard} from '../src/restart-guard.js';
+test('reinicio espera 500 ms desde que aparece el menú, incluso tras una muerte larga',()=>{let now=0;const guard=new RestartGuard(()=>now);guard.lock();now=2000;assert.equal(guard.ready,false);guard.show();now=2499;assert.equal(guard.ready,false);now=2500;assert.equal(guard.ready,true);guard.lock();assert.equal(guard.ready,false);guard.reset();assert.equal(guard.ready,true)});

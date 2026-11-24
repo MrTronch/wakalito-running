@@ -4,6 +4,7 @@ import {RunnerState,PLAYER_X} from './engine.js';
 import {KeyboardControls} from './controls.js';
 import {BodyControls} from '#body-controls';
 import {BodyControls as NoCameraControls} from './no-camera-controls.js';
+import {RestartGuard} from './restart-guard.js';
 import {GameAudio} from './audio.js';
 import {createWorld} from './world.js';
 import {loadWorldModels} from './world-models.js';
@@ -31,26 +32,27 @@ function resize(){
  camera.aspect=innerWidth/innerHeight;
  const depth=Math.max(8.5,(touchMode&&camera.aspect<1?4.6:2.02)/(Math.tan(T.MathUtils.degToRad(camera.fov/2))*camera.aspect));
  const x=PLAYER_X+.36*depth*Math.tan(T.MathUtils.degToRad(camera.fov/2))*camera.aspect;
- camera.position.set(x,touchMode&&camera.aspect<1?5.0:2.65,depth);
- camera.lookAt(x,touchMode&&camera.aspect<1?3.87:1.52,0);
+ camera.position.set(x,touchMode&&camera.aspect<1?3.5:2.65,depth);
+ camera.lookAt(x,touchMode&&camera.aspect<1?2.37:1.52,0);
  camera.updateProjectionMatrix();
  atmosphere.setMobile(touchMode&&camera.aspect<1);
 }
 resize();window.addEventListener('resize',resize);
 scene.add(new T.HemisphereLight(0xffded9,0x76604e,1.25));const sun=new T.DirectionalLight(0xffb16b,3.4);sun.position.set(14,8,-15);sun.target.position.set(-4,.8,0);scene.add(sun.target);sun.castShadow=true;sun.shadow.mapSize.set(touchMode?1024:2048,touchMode?1024:2048);Object.assign(sun.shadow.camera,{left:-21,right:25,top:19,bottom:-19,near:1,far:75});sun.shadow.normalBias=.012;sun.shadow.bias=-.00012;sun.shadow.camera.updateProjectionMatrix();
  atmosphere.setMobile(touchMode&&camera.aspect<1);scene.add(sun);const characterFill=new T.DirectionalLight(0xffecd9,1.75);characterFill.position.set(-10,4.2,6);scene.add(characterFill);
+const restartGuard=new RestartGuard();
 const visuals=new Map();let world,character,lastDuck=false,paused=false,gameOverShown=false;
 let countdown=null;
 function cancelCountdown(){if(countdown)clearInterval(countdown);countdown=null;$('countdown').hidden=true}
 function start(){
- if(!character||countdown)return;
+ if(!character||countdown||(state.mode==='over'&&!restartGuard.ready))return;
  if(!body.ready){$('message').textContent='Activa la cámara, calibra de pie y vuelve al encuadre antes de comenzar.';return}
  if(body.mode==='body'){
   let count=3;$('countdown').textContent=count;$('countdown').hidden=false;
   countdown=setInterval(()=>{if(!body.ready){cancelCountdown();$('message').textContent='Vuelve al encuadre y pulsa Comenzar.';return}count--;if(count>0)$('countdown').textContent=count;else{cancelCountdown();beginRun()}},1000);
  }else beginRun();
 }
-function beginRun(){if(!character)return;audio.unlock();if(paused){pause();return}if(state.mode==='running')return;for(const {model} of visuals.values())scene.remove(model);visuals.clear();dust.clear();audio.reset();state.start(touchMode?'touch':body.mode);gameOverShown=false;character.pivot.position.set(PLAYER_X,0,0);character.play('run');$('overlay').classList.add('hidden')}
+function beginRun(){if(!character)return;restartGuard.reset();audio.unlock();if(paused){pause();return}if(state.mode==='running')return;for(const {model} of visuals.values())scene.remove(model);visuals.clear();dust.clear();audio.reset();state.start(touchMode?'touch':body.mode);gameOverShown=false;character.pivot.position.set(PLAYER_X,0,0);character.play('run');$('overlay').classList.add('hidden')}
 function pause(){if(state.mode!=='running')return;if(paused&&!body.ready){$('message').textContent='Vuelve al encuadre o cambia a teclado para continuar.';return}cancelCountdown();paused=!paused;audio.setRunning(!paused);$('overlay').classList.toggle('hidden',!paused);if(paused){$('message').textContent='Tu camino te espera.';$('start').textContent='Continuar';document.querySelector('h1').innerHTML='Una pequeña<br><em>pausa.</em>'}$('pause').textContent=paused?'▶':'Ⅱ'}
 function hold(){cancelCountdown();state.setDuck(false);if(state.mode==='running'&&!paused)pause()}
 const body=new (touchMode?NoCameraControls:BodyControls)({hold,canConfirm(){return !countdown&&(state.mode!=='running'||paused)},confirm:start,duck(v){if(!paused&&!countdown&&state.mode==='running'){state.setDuck(v);if(state.duck)character.play('duck',true)}else state.setDuck(false)},jump(){if(state.mode==='running'&&!paused&&!countdown&&state.jump()){character.play('jump',true);audio.jump()}},modeChanged(mode){state.setControlMode(mode);$('message').textContent=mode==='body'?'Activa tu cámara, encuadra el cuerpo y calibra de pie.':'Espacio para saltar. Flecha abajo o S para agacharte.';}});
@@ -82,6 +84,7 @@ const clock=new T.Clock();function frame(){requestAnimationFrame(frame);const dt
   const position=character.pivot.position;
   position.y=state.y;
   if(crashed){
+   restartGuard.lock();$('start').disabled=true;
    audio.hit();
    character.play('death');
    dust.impact(position.x+.46,position.y+.54);
@@ -98,7 +101,7 @@ const clock=new T.Clock();function frame(){requestAnimationFrame(frame);const dt
  dust.update(dt,state.mode==='running'&&state.y===0&&state.vy<=0,PLAYER_X,state.speed);
  audio.update(dt,{running:state.mode==='running',grounded:state.y===0&&state.vy<=0,duck:state.duck,speed:state.speed});
  if(crashed){best=Math.max(best,Math.floor(state.distance));try{localStorage.setItem('wakalito-best',String(best))}catch{}$('best').textContent=String(best).padStart(5,'0')}
- if(state.mode==='over'){state.hitTime+=dt;if(state.hitTime>1.15&&!gameOverShown){gameOverShown=true;$('overlay').classList.remove('hidden');document.querySelector('h1').innerHTML='Vuelve al<br><em>camino.</em>';$('message').textContent=`Recorriste ${Math.floor(state.distance)} metros. Cada intento abre un nuevo camino.`;$('start').textContent='Volver a correr →'}}
+ if(state.mode==='over'){state.hitTime+=dt;if(state.hitTime>1.15&&!gameOverShown){gameOverShown=true;restartGuard.show();$('overlay').classList.remove('hidden');document.querySelector('h1').innerHTML='Vuelve al<br><em>camino.</em>';$('message').textContent=`Recorriste ${Math.floor(state.distance)} metros. Cada intento abre un nuevo camino.`;$('start').textContent='Volver a correr →'}if(gameOverShown)$('start').disabled=!restartGuard.ready}
  $('score').textContent=String(Math.floor(state.distance)).padStart(5,'0');$('speed').textContent=(state.speed/7).toFixed(1)+'×';renderer.render(scene,camera);
  if(renderStats){renderStats.frames++;const elapsed=performance.now()-renderStats.start;if(elapsed>=1000){const canvas=$('world');canvas.dataset.playerY=state.y.toFixed(3);canvas.dataset.duck=String(state.duck);canvas.dataset.mode=state.mode;canvas.dataset.audioState=audio.context?.state||'not-started';canvas.dataset.fps=(renderStats.frames*1000/elapsed).toFixed(1);canvas.dataset.drawCalls=String(renderer.info.render.calls);canvas.dataset.triangles=String(renderer.info.render.triangles);renderStats.frames=0;renderStats.start=performance.now()}}
 }frame();
