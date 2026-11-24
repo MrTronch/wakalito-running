@@ -15,10 +15,10 @@ export function normalizeModel(model,height=1,dimensions){
 }
 export async function loadWorldModels(){
  const loader=new GLTFLoader(),base=`${import.meta.env.BASE_URL}models/`;
- const loaded=await Promise.all(Object.entries(WORLD_MODEL_FILES).map(async([name,file])=>[name,await loader.loadAsync(base+file)]));
+ const loaded=await Promise.all(Object.entries(WORLD_MODEL_FILES).map(async([name,file])=>[name,await loader.loadAsync(base+file+(name==='mushroom'?'?v=earth-20261123':''))]));
  const sources=Object.fromEntries(loaded),models={};
  for(const [name,gltf] of loaded){if(name==='dragon')continue;
-  gltf.scene.traverse(object=>{if(!object.isMesh)return;const materials=Array.isArray(object.material)?object.material:[object.material];for(const m of materials){if(name==='grass'){m.transparent=false;m.alphaTest=.45;m.depthWrite=true}for(const key of ['map','normalMap','roughnessMap','metalnessMap'])if(m[key])m[key].anisotropy=4}});
+  gltf.scene.traverse(object=>{if(!object.isMesh)return;const materials=Array.isArray(object.material)?object.material:[object.material];for(const m of materials){if(name==='mushroom'){if(m.color.r>m.color.g*3)m.color.set(0x8c8057);m.roughness=.9;m.metalness=0}if(name==='grass'){m.transparent=false;m.alphaTest=.45;m.depthWrite=true}for(const key of ['map','normalMap','roughnessMap','metalnessMap'])if(m[key])m[key].anisotropy=4}});
   models[name]=normalizeModel(gltf.scene);
  }
  models.rockObstacle=normalizeModel(models.rock.clone(),1,new T.Vector3(1.1,.76,.86));
