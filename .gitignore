@@ -1,0 +1,19 @@
+node_modules/
+.npm-cache/
+dist/
+dist-public/
+release-public/
+*.exe
+*.blend
+*.blend1
+.env*
+# Local camera adapter and models must never enter the public repository.
+public/mediapipe/
+src/body-controls.js
+src/body-gestures.js
+src/camera-diagnostics.js
+src/peace-confirmation.js
+tests/body-gestures.test.js
+tests/camera-diagnostics.test.js
+tests/peace-confirmation.test.js
+desktop/

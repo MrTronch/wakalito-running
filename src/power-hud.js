@@ -1,0 +1,5 @@
+export class PowerHUD {
+ constructor(records){this.records=records;this.coins=document.getElementById('coin-count');this.score=document.getElementById('total-score');this.meter=document.getElementById('rage-meter');this.label=document.getElementById('rage-label');this.timer=document.getElementById('rage-timer')}
+ update(state){const rage=state.rage;this.coins.textContent=state.collectedCoins;this.score.textContent=state.totalScore.toLocaleString('es-PE');this.meter.value=Math.min(100,rage.meter);this.label.textContent=(`${rage.active?'WAKALITO RAGE':'RAGE'} · ${Math.min(100,rage.meter)} / 100`);this.timer.hidden=!rage.active;this.timer.textContent=`${rage.warning?"TERMINA EN ":""}${Math.ceil(rage.remaining)} s`;this.meter.classList.toggle('charged',rage.active);this.timer.classList.toggle('ending',rage.warning)}
+ summary(state){return `${Math.floor(state.distance)} metros · ${state.collectedCoins} monedas\nPuntuación: ${state.totalScore.toLocaleString('es-PE')} puntos\nMejor puntuación: ${this.records.total.toLocaleString('es-PE')} puntos`}
+}

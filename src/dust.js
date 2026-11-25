@@ -38,14 +38,15 @@ export function createDust(scene) {
      .24+Math.random()*.44,.12+Math.random()*.34,.9,i%3===0?0xffd095:0xb66a46,5.5);
    }
   },
-  update(dt,grounded,x,speed){
+  update(dt,grounded,x,speed,rage=false){
    if(grounded){
     stepTravel+=dt*speed;
-    while(stepTravel>=.44){
-     stepTravel-=.44;
-     for(let i=0;i<3;i++)puff(x-.22-Math.random()*.4,.08+Math.random()*.09,(Math.random()-.5)*.5,
+    const spacing=rage?.24:.44;
+    while(stepTravel>=spacing){
+     stepTravel-=spacing;
+     for(let i=0;i<(rage?4:3);i++)puff(x-.22-Math.random()*.4,.08+Math.random()*.09,(Math.random()-.5)*.5,
       -speed*(.46+Math.random()*.18),.15+Math.random()*.5,(Math.random()-.5)*.62,
-      .31+Math.random()*.21,.24+Math.random()*.19,.69,0xe2bb87,.45);
+      .31+Math.random()*.21,(.24+Math.random()*.19)*(rage?1.45:1),rage?.85:.69,rage?0xf1c77d:0xe2bb87,.45);
     }
    }else stepTravel=0;
    for(const p of particles){

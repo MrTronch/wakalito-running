@@ -1,9 +1,9 @@
 // User-supplied effects and ambience; original synthesized footsteps.
 export const STEP_PITCH=2**(-4/12);
-export const AUDIO_FILES={jump:'jump.wav',roll:'roll.wav',damage:'damage.wav',ambience:'loop wakalito running.wav'};
+export const AUDIO_FILES={coin:'coin.wav',rock:'rock.wav',beginRage:'begin rage.wav',endRage:'end rage.wav',jump:'jump.wav',roll:'roll.wav',damage:'damage.wav',ambience:'loop wakalito running.mp3',rage:'loop wakalito running rage.mp3'};
 export class GameAudio {
- constructor(){this.enabled=true;this.context=null;this.stepTime=0;this.wasGrounded=false;this.buffers={};this.running=false;this.musicOffset=0}
- load(base){this.loading=Promise.all(Object.entries(AUDIO_FILES).map(async([name,file])=>{const response=await fetch(base+encodeURIComponent(file));if(!response.ok)throw new Error(`Audio: ${file}`);return [name,await response.arrayBuffer()]})).then(entries=>this.bytes=entries);return this.loading}
+ constructor(){this.enabled=true;this.context=null;this.stepTime=0;this.wasGrounded=false;this.buffers={};this.running=false;this.musicOffset=0;this.rageOffset=0;this.rageActive=false}
+ load(base){this.loading=Promise.all(Object.entries(AUDIO_FILES).map(async([name,file])=>{const response=await fetch(base+encodeURIComponent(file)+'?v=20261125-clava3');if(!response.ok)throw new Error(`Audio: ${file}`);return [name,await response.arrayBuffer()]})).then(entries=>this.bytes=entries);return this.loading}
  prepare(){if(this.decoding||!this.loading||!this.context)return;this.decoding=this.loading.then(entries=>Promise.all(entries.map(async([name,data])=>{this.buffers[name]=await this.context.decodeAudioData(data.slice(0))}))).then(()=>this.setRunning(this.running)).catch(error=>console.error('No se pudieron decodificar los sonidos',error))}
  unlock(){
   if(!this.enabled)return;
@@ -22,12 +22,27 @@ export class GameAudio {
   this.tone((landing?140:180+Math.random()*30)*STEP_PITCH,65*STEP_PITCH,.075,landing?.32:.18);
   const source=c.createBufferSource(),filter=c.createBiquadFilter(),gain=c.createGain();source.buffer=this.noise;source.playbackRate.value=STEP_PITCH;filter.type='lowpass';filter.frequency.value=(landing?1400:950)*STEP_PITCH;gain.gain.setValueAtTime(landing?.16:.09,c.currentTime);gain.gain.exponentialRampToValueAtTime(.001,c.currentTime+.09);source.connect(filter);filter.connect(gain);gain.connect(this.master);source.start();source.onended=()=>{source.disconnect();filter.disconnect();gain.disconnect()};
  }
- sample(name){const c=this.context;if(!this.enabled||c?.state!=='running'||!this.buffers[name])return;const source=c.createBufferSource(),gain=c.createGain();source.buffer=this.buffers[name];gain.gain.value=.8;source.connect(gain);gain.connect(this.master);source.start();source.onended=()=>{source.disconnect();gain.disconnect()}}
- setRunning(running){this.running=running;const c=this.context;if(!running&&this.music){this.musicOffset=(this.musicOffset+c.currentTime-this.musicStarted)%this.buffers.ambience.duration;this.music.stop();this.music=null}if(running&&!this.music&&this.buffers.ambience&&c?.state==='running'){const source=c.createBufferSource(),gain=c.createGain();source.buffer=this.buffers.ambience;source.loop=true;gain.gain.value=.65;source.connect(gain);gain.connect(this.master);source.start(0,this.musicOffset);this.musicStarted=c.currentTime;this.music=source;source.onended=()=>{source.disconnect();gain.disconnect()}}}
+ sample(name,{pitch=1,volume=.8}={}){const c=this.context;if(!this.enabled||c?.state!=='running'||!this.buffers[name])return;const source=c.createBufferSource(),gain=c.createGain();source.buffer=this.buffers[name];if(source.playbackRate)source.playbackRate.value=pitch;gain.gain.value=volume;source.connect(gain);gain.connect(this.master);source.start();source.onended=()=>{source.disconnect();gain.disconnect()}}
+ fade(gain,value){if(!gain)return;const param=gain.gain;if(param.setTargetAtTime)param.setTargetAtTime(value,this.context.currentTime,.18);else param.value=value}
+ setRage(active){if(this.rageActive===active)return;this.rageActive=active;if(active){if(this.rageMusic){this.rageMusic.stop();this.rageMusic=null}this.rageOffset=0;this.setRunning(this.running)}this.fade(this.musicGain,active?.025:.9);this.fade(this.rageGain,active?.65:0)}
+ setRunning(running){
+  this.running=running;const c=this.context;
+  for(const [bufferKey,sourceKey,gainKey,offsetKey,startedKey] of [['ambience','music','musicGain','musicOffset','musicStarted'],['rage','rageMusic','rageGain','rageOffset','rageStarted']]){
+   if(!running&&this[sourceKey]){this[offsetKey]=(this[offsetKey]+c.currentTime-this[startedKey])%this.buffers[bufferKey].duration;this[sourceKey].stop();this[sourceKey]=null}
+   if(running&&!this[sourceKey]&&this.buffers[bufferKey]&&c?.state==='running'){
+    const source=c.createBufferSource(),gain=c.createGain();source.buffer=this.buffers[bufferKey];source.loop=true;gain.gain.value=bufferKey==='rage'?(this.rageActive?.65:0):(this.rageActive?.025:.9);source.connect(gain);gain.connect(this.master);source.start(0,this[offsetKey]);this[startedKey]=c.currentTime;this[sourceKey]=source;this[gainKey]=gain;source.onended=()=>{source.disconnect();gain.disconnect()};
+   }
+  }
+ }
+ coin(value=1){this.sample('coin',{pitch:value===5?2**(6/12):1,volume:value===5?1.6:.4})}
+ transform(){this.sample('beginRage',{volume:1.6})}
+ endRage(){this.sample('endRage')}
+ impact(type){if(type==='stone')this.sample('rock');else this.tone(180,45,.17,.16,'triangle')}
+
  jump(){this.sample('jump');this.wasGrounded=false;this.stepTime=0}
- roll(){this.sample('roll')}
+ roll(){this.sample('roll',{volume:1.6})}
  hit(){this.sample('damage');this.setRunning(false);this.reset()}
- reset(){this.stepTime=0;this.wasGrounded=false}
+ reset(){this.stepTime=0;this.wasGrounded=false;this.setRage(false)}
  update(dt,{running,grounded,duck,speed}){
   this.setRunning(running);
   if(!running){this.reset();return}

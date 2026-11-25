@@ -46,6 +46,7 @@ export function createWorld(scene,models){
   const geometry=ridgeGeometry(config.seed),mat=material(config.color,{vertexColors:true});const span=112*config.scale;
   for(let tile=-1;tile<=1;tile++){const r=mesh(geometry,mat,tile*span,config.y,config.z,config.scale,config.scale*.62,config.scale);r.castShadow=false;r.userData={speed:config.speed,span};layers.push(r)}
  }
+ const clavas=[];
  const moving=[];function register(g,speed){scene.add(g);g.userData.speed=speed;moving.push(g);return g}
  function placeModel(template,parent,x,z,scale,yaw,shadow=true){
   const model=template.clone();
@@ -66,6 +67,8 @@ export function createWorld(scene,models){
   else if(i%5===3)placeModel(models.mushroom,g,0,0,.75+Math.random()*.6,yaw);
   else {placeModel(models.rock,g,0,0,.4+Math.random()*.35,i);grass(g,.65,.2,.8)}
  }
+ // Three animated background landmarks, always outside the playable path.
+ for(let i=0;i<3;i++){const clava=models.createClava(),g=register(new T.Group(),1);g.position.set(i*49.5+10.5,0,-9.5-i%2*2);clava.model.scale.multiplyScalar(2.4+i*.2);clava.model.rotation.y=(i-1)*.15;clava.model.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=true}});g.add(clava.model);clava.parent=g;clavas.push(clava)}
  for(let i=0;i<55;i++){
   const g=register(new T.Group(),1);g.position.set(Math.random()*148.5-45,0,(i%2?1:-1)*(2.8+Math.random()*3.5));
   grass(g,0,0,.6+Math.random()*.6);
@@ -111,8 +114,8 @@ export function createWorld(scene,models){
   bird.model.position.set(i*17-38,6+Math.random()*3,-17-Math.random()*13);
   bird.model.scale.setScalar(.65+Math.random()*.3);scene.add(bird.model);skyBirds.push(bird);
  }
- function obstacle(type){if(type==='dragon')return models.createDragon();return {model:models.rockObstacle.clone()}}
- return {obstacle,update(dt,speed){surfaces.update(speed*dt);pathTravel=(pathTravel+speed*dt)%PATH_TILE_LENGTH;for(let i=0;i<pathTiles.length;i++)pathTiles[i].position.x=(i-3)*PATH_TILE_LENGTH-pathTravel;for(const r of layers){r.position.x-=speed*dt*r.userData.speed;if(r.position.x<-r.userData.span*1.5)r.position.x+=r.userData.span*3}for(const g of moving){g.position.x-=speed*dt*g.userData.speed;if(g.position.x<-45)g.position.x+=g.userData.span||148.5}for(const bird of skyBirds){const {position}=bird.model;position.x-=dt*(1+speed*.18);if(position.x<-50)position.x=90;bird.update(dt)}}};
+ function obstacle(type){if(type==='dragon')return models.createDragon();if(type==='cactus'){const model=models.cactus.clone();model.scale.multiplyScalar(1.2);return {model}}return {model:models.rockObstacle.clone()}}
+ return {obstacle,update(dt,speed){for(const clava of clavas)if(clava.parent.position.x>-20&&clava.parent.position.x<28)clava.update(dt);surfaces.update(speed*dt);pathTravel=(pathTravel+speed*dt)%PATH_TILE_LENGTH;for(let i=0;i<pathTiles.length;i++)pathTiles[i].position.x=(i-3)*PATH_TILE_LENGTH-pathTravel;for(const r of layers){r.position.x-=speed*dt*r.userData.speed;if(r.position.x<-r.userData.span*1.5)r.position.x+=r.userData.span*3}for(const g of moving){g.position.x-=speed*dt*g.userData.speed;if(g.position.x<-45)g.position.x+=g.userData.span||148.5}for(const bird of skyBirds){const {position}=bird.model;position.x-=dt*(1+speed*.18);if(position.x<-50)position.x=90;bird.update(dt)}}};
 }
 
 

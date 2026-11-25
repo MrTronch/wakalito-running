@@ -17,7 +17,7 @@ export default defineConfig(({mode,command})=>{
   build:{outDir:isPublic?'dist-public':'dist'},
   plugins:isPublic?[{
    name:'public-without-camera',transformIndexHtml:publicHTML,
-   closeBundle(){if(command==='build')cpSync('public',resolve('dist-public'),{recursive:true,filter:path=>!path.split(/[\\/]/).includes('mediapipe')&&!path.endsWith('eye-1.png')&&!path.endsWith('inti.glb')})}
+   closeBundle(){if(command==='build')cpSync('public',resolve('dist-public'),{recursive:true,filter:path=>!path.split(/[\\/]/).includes('mediapipe')&&!path.endsWith('eye-1.png')&&!path.endsWith('inti.glb')&&!path.endsWith('loop wakalito running.wav')&&!path.endsWith('loop wakalito running rage.wav')&&!path.endsWith('Montserrat-Variable.ttf')})}
   }]:[]
  };
 });
