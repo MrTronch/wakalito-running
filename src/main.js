@@ -40,8 +40,8 @@ function resize(){
  document.querySelector('.hint').textContent=touchMode?'Desliza ↑ para saltar · Desliza ↓ para rodar.':'ESPACIO / ↑ saltar · ↓ / S agacharse';
  renderer.setSize(innerWidth,innerHeight);
  camera.aspect=innerWidth/innerHeight;
- const depth=Math.max(8.5,(touchMode&&camera.aspect<1?5.3:2.02)/(Math.tan(T.MathUtils.degToRad(camera.fov/2))*camera.aspect));
- const x=PLAYER_X+.36*depth*Math.tan(T.MathUtils.degToRad(camera.fov/2))*camera.aspect;
+ const depth=Math.max(8.5,(touchMode&&camera.aspect<1?(5.3/1.05):2.02)/(Math.tan(T.MathUtils.degToRad(camera.fov/2))*camera.aspect));
+ const x=PLAYER_X+(touchMode&&camera.aspect<1?.50:.36)*depth*Math.tan(T.MathUtils.degToRad(camera.fov/2))*camera.aspect;
  camera.position.set(x,touchMode&&camera.aspect<1?3.5:2.65,depth);
  camera.lookAt(x,touchMode&&camera.aspect<1?2.37:1.52,0);
  camera.updateProjectionMatrix();
