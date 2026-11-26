@@ -17,6 +17,7 @@ import {loadNazca,createNazca} from './night.js';
 import {addSunset} from './sunset.js';
 import {createMenuCharacter} from './menu-character.js';
 import {createDust} from './dust.js';
+import {reserveMobileJumpSpace} from './mobile-framing.js';
 // Local QA fixture only: the production bundle never grants extra coins.
 const qaMode=import.meta.env.DEV?new URLSearchParams(location.search).get('qa'):null;
 const qaRage=qaMode==='rage',qaNight=qaMode==='night'||qaMode==='dusk';
@@ -44,10 +45,12 @@ function resize(){
  const x=PLAYER_X+(touchMode&&camera.aspect<1?.50:.36)*depth*Math.tan(T.MathUtils.degToRad(camera.fov/2))*camera.aspect;
  camera.position.set(x,touchMode&&camera.aspect<1?3.5:2.65,depth);
  camera.lookAt(x,touchMode&&camera.aspect<1?2.37:1.52,0);
+ camera.clearViewOffset();
  camera.updateProjectionMatrix();
+ if(touchMode&&camera.aspect<1){const hudBottom=document.querySelector('.power-hud').getBoundingClientRect().bottom;reserveMobileJumpSpace(camera,innerWidth,innerHeight,hudBottom)}
  atmosphere.setMobile(touchMode&&camera.aspect<1);
 }
-resize();window.addEventListener('resize',resize);
+resize();window.addEventListener('resize',resize);window.visualViewport?.addEventListener('resize',resize);document.fonts.ready.then(resize);
 const ambient=new T.HemisphereLight(0xffded9,0x76604e,1.25);scene.add(ambient);const sun=new T.DirectionalLight(0xffb16b,3.4);sun.position.set(14,8,-15);sun.target.position.set(-4,.8,0);scene.add(sun.target);sun.castShadow=true;sun.shadow.mapSize.set(touchMode?1024:2048,touchMode?1024:2048);Object.assign(sun.shadow.camera,{left:-21,right:25,top:19,bottom:-19,near:1,far:75});sun.shadow.normalBias=.012;sun.shadow.bias=-.00012;sun.shadow.camera.updateProjectionMatrix();
  atmosphere.setMobile(touchMode&&camera.aspect<1);scene.add(sun);const characterFill=new T.DirectionalLight(0xffecd9,1.75);characterFill.position.set(-10,4.2,6);scene.add(characterFill);
 const restartGuard=new RestartGuard();
@@ -130,6 +133,7 @@ const clock=new T.Clock();function frame(){requestAnimationFrame(frame);const dt
  $('score').textContent=String(Math.floor(state.distance)).padStart(5,'0');$('speed').textContent=(state.speed/7).toFixed(1)+'×';renderer.render(scene,camera);
  if(renderStats){renderStats.frames++;const elapsed=performance.now()-renderStats.start;if(elapsed>=1000){const canvas=$('world');canvas.dataset.playerY=state.y.toFixed(3);canvas.dataset.duck=String(state.duck);canvas.dataset.mode=state.mode;canvas.dataset.audioState=audio.context?.state||'not-started';canvas.dataset.fps=(renderStats.frames*1000/elapsed).toFixed(1);canvas.dataset.drawCalls=String(renderer.info.render.calls);canvas.dataset.triangles=String(renderer.info.render.triangles);renderStats.frames=0;renderStats.start=performance.now()}}
 }frame();
+
 
 
 

@@ -127,3 +127,18 @@ html:has(.overlay:not(.hidden)) .hud{visibility:hidden}
 .night-scene .hud,.night-scene .power-hud,.night-scene header .title,.night-scene .place,.night-scene footer{color:#fff0cc}
 .night-scene #rage-timer{color:#ffe5a3}
 .night-scene #rage-timer.ending{color:#713d0e}
+
+/* Keep the mobile HUD above the character's jumping silhouette. */
+@media(max-width:700px) and (orientation:portrait),(pointer:coarse) and (orientation:portrait){
+ html.touch-game .hud{top:clamp(130px,18vh,185px)}
+ html.touch-game .hud strong{letter-spacing:.035em}
+ html.touch-game .power-hud{top:calc(clamp(130px,18vh,185px) + 96px)}
+}
+@media(max-height:650px) and (orientation:portrait){
+ html.touch-game .hud{top:112px;padding:4px 0 8px;gap:3px 10px}
+ html.touch-game .hud strong{font-size:clamp(32px,10.8vw,42px)}
+ html.touch-game .hud>div:nth-child(2) small{font-size:10px}
+ html.touch-game .hud>div:nth-child(2) b{font-size:16px}
+ html.touch-game .power-hud{top:calc(112px + clamp(32px,10.8vw,42px) + 39px)}
+ html.touch-game .chakana-symbol{font-size:17px}
+}

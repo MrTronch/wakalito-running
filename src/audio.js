@@ -39,7 +39,7 @@ export class GameAudio {
  endRage(){this.sample('endRage')}
  impact(type){if(type==='stone')this.sample('rock');else this.tone(180,45,.17,.16,'triangle')}
 
- jump(){this.sample('jump');this.wasGrounded=false;this.stepTime=0}
+ jump(){this.sample('jump',{pitch:2**(-4/12),volume:.65});this.wasGrounded=false;this.stepTime=0}
  roll(){this.sample('roll',{volume:1.6})}
  hit(){this.sample('damage');this.setRunning(false);this.reset()}
  reset(){this.stepTime=0;this.wasGrounded=false;this.setRage(false)}
