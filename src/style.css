@@ -142,3 +142,10 @@ html:has(.overlay:not(.hidden)) .hud{visibility:hidden}
  html.touch-game .power-hud{top:calc(112px + clamp(32px,10.8vw,42px) + 39px)}
  html.touch-game .chakana-symbol{font-size:17px}
 }
+
+.mobile-gesture-footer{display:none}
+@media(max-width:700px) and (orientation:portrait),(pointer:coarse) and (orientation:portrait){
+ html.touch-game footer{bottom:max(58px,calc(env(safe-area-inset-bottom) + 46px));left:4%;right:4%;width:auto;text-align:center}
+ html.touch-game footer .desktop-tagline{display:none}
+ html.touch-game footer .mobile-gesture-footer{display:inline;font-size:10px;letter-spacing:.3px;text-transform:none}
+}

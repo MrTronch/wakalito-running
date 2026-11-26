@@ -25,7 +25,7 @@ const $=id=>document.getElementById(id),state=new RunnerState(),records=new Scor
 const mobileLayout=()=>innerWidth<=700||(innerWidth<=1024&&matchMedia('(pointer:coarse)').matches);
 let touchMode=mobileLayout();
 document.documentElement.classList.toggle('touch-game',touchMode);
-if(touchMode){$('mode-body')?.setAttribute('hidden','');document.querySelector('.mode-picker')?.setAttribute('hidden','');$('settings').hidden=true;document.querySelector('.hint').textContent='Desliza ↑ para saltar · Desliza ↓ para rodar.'}
+if(touchMode){$('mode-body')?.setAttribute('hidden','');document.querySelector('.mode-picker')?.setAttribute('hidden','');$('settings').hidden=true;document.querySelector('.hint').textContent='Swipe up · Saltar / Swipe down · Rodar'}
 const audio=new GameAudio();const audioReady=audio.load(`${import.meta.env.BASE_URL}audio/`);try{audio.enabled=localStorage.getItem('wakalito-sound')!=='off'}catch{}
 function updateSound(){const button=$('sound');button.setAttribute('aria-pressed',String(audio.enabled));button.setAttribute('aria-label',audio.enabled?'Silenciar efectos':'Activar efectos');button.textContent=audio.enabled?'♪':'♪̸'}
 updateSound();$('sound').onclick=()=>{audio.setEnabled(!audio.enabled);try{localStorage.setItem('wakalito-sound',audio.enabled?'on':'off')}catch{}updateSound()};
@@ -38,7 +38,7 @@ function resize(){
  const nextTouchMode=mobileLayout();
  if(nextTouchMode!==touchMode){touchMode=nextTouchMode;document.documentElement.classList.toggle('touch-game',touchMode);if(state.controlMode!=='body')state.setControlMode(touchMode?'touch':'keyboard')}
  document.querySelector('.gesture-guide').hidden=!touchMode;
- document.querySelector('.hint').textContent=touchMode?'Desliza ↑ para saltar · Desliza ↓ para rodar.':'ESPACIO / ↑ saltar · ↓ / S agacharse';
+ document.querySelector('.hint').textContent=touchMode?'Swipe up · Saltar / Swipe down · Rodar':'ESPACIO / ↑ saltar · ↓ / S agacharse';
  renderer.setSize(innerWidth,innerHeight);
  camera.aspect=innerWidth/innerHeight;
  const depth=Math.max(8.5,(touchMode&&camera.aspect<1?(5.3/1.05):2.02)/(Math.tan(T.MathUtils.degToRad(camera.fov/2))*camera.aspect));
@@ -133,6 +133,7 @@ const clock=new T.Clock();function frame(){requestAnimationFrame(frame);const dt
  $('score').textContent=String(Math.floor(state.distance)).padStart(5,'0');$('speed').textContent=(state.speed/7).toFixed(1)+'×';renderer.render(scene,camera);
  if(renderStats){renderStats.frames++;const elapsed=performance.now()-renderStats.start;if(elapsed>=1000){const canvas=$('world');canvas.dataset.playerY=state.y.toFixed(3);canvas.dataset.duck=String(state.duck);canvas.dataset.mode=state.mode;canvas.dataset.audioState=audio.context?.state||'not-started';canvas.dataset.fps=(renderStats.frames*1000/elapsed).toFixed(1);canvas.dataset.drawCalls=String(renderer.info.render.calls);canvas.dataset.triangles=String(renderer.info.render.triangles);renderStats.frames=0;renderStats.start=performance.now()}}
 }frame();
+
 
 
 

@@ -65,14 +65,14 @@ export function createWorld(scene,models){
   else if(i%5===1)cactus(g,0,0,1.3+Math.random()*.9);
   else if(i%5===2){placeModel(models.ruins,g,0,0,2.65+(Math.random()-.5)*.2,(Math.random()-.5)*.28);placeModel(models.mushroom,g,1.1,.25,.6+Math.random()*.35,yaw)}
   else if(i%5===3)placeModel(models.mushroom,g,0,0,.75+Math.random()*.6,yaw);
-  else {placeModel(models.rock,g,0,0,.4+Math.random()*.35,i);grass(g,.65,.2,.8)}
+  else {placeModel(models.rock,g,0,0,.28+Math.random()*.245,i);grass(g,.65,.2,.8)}
  }
  // Three animated background landmarks, always outside the playable path.
  for(let i=0;i<3;i++){const clava=models.createClava(),g=register(new T.Group(),1);g.position.set(i*49.5+10.5,0,-9.5-i%2*2);clava.model.scale.multiplyScalar(2.4+i*.2);clava.model.rotation.y=(i-1)*.15;clava.model.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=true}});g.add(clava.model);clava.parent=g;clavas.push(clava)}
  for(let i=0;i<55;i++){
   const g=register(new T.Group(),1);g.position.set(Math.random()*148.5-45,0,(i%2?1:-1)*(2.8+Math.random()*3.5));
   grass(g,0,0,.6+Math.random()*.6);
-  if(i%6===0)placeModel(models.rock,g,.3,.1,.22+Math.random()*.2,i);
+  if(i%6===0)placeModel(models.rock,g,.3,.1,.154+Math.random()*.14,i);
   if(i%11===0)placeModel(models.mushroom,g,.4,.15,.35+Math.random()*.3,(Math.random()-.5)*.9);
  }
  for(let i=0;i<10;i++){
@@ -117,6 +117,7 @@ export function createWorld(scene,models){
  function obstacle(type){if(type==='dragon')return models.createDragon();if(type==='cactus'){const model=models.cactus.clone();model.scale.multiplyScalar(1.2);return {model}}return {model:models.rockObstacle.clone()}}
  return {obstacle,update(dt,speed){for(const clava of clavas)if(clava.parent.position.x>-20&&clava.parent.position.x<28)clava.update(dt);surfaces.update(speed*dt);pathTravel=(pathTravel+speed*dt)%PATH_TILE_LENGTH;for(let i=0;i<pathTiles.length;i++)pathTiles[i].position.x=(i-3)*PATH_TILE_LENGTH-pathTravel;for(const r of layers){r.position.x-=speed*dt*r.userData.speed;if(r.position.x<-r.userData.span*1.5)r.position.x+=r.userData.span*3}for(const g of moving){g.position.x-=speed*dt*g.userData.speed;if(g.position.x<-45)g.position.x+=g.userData.span||148.5}for(const bird of skyBirds){const {position}=bird.model;position.x-=dt*(1+speed*.18);if(position.x<-50)position.x=90;bird.update(dt)}}};
 }
+
 
 
 

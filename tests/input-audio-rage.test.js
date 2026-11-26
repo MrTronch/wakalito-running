@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import {SwipeControls} from '../src/gestures.js';
 import {GameAudio} from '../src/audio.js';
 
-test('salto baja dos tonos completos y reduce ligeramente su volumen',()=>{const audio=new GameAudio(),events=[];audio.sample=(name,options)=>events.push({name,options});audio.jump();assert.equal(events[0].name,'jump');assert.equal(events[0].options.pitch,2**(-4/12));assert.equal(events[0].options.volume,.65);assert.equal(audio.wasGrounded,false);assert.equal(audio.stepTime,0)});
+test('salto conserva tono original y volumen ligeramente reducido',()=>{const audio=new GameAudio(),events=[];audio.sample=(name,options)=>events.push({name,options});audio.jump();assert.equal(events[0].name,'jump');assert.equal(events[0].options.pitch,1);assert.equal(events[0].options.volume,.65);assert.equal(audio.wasGrounded,false);assert.equal(audio.stepTime,0)});
 
-test('mezcla de monedas reduce la normal, duplica x5 y usa rock sólo para piedra',()=>{const audio=new GameAudio(),events=[];audio.sample=(name,options)=>events.push({name,options});audio.coin();audio.coin(5);audio.impact('stone');audio.tone=()=>events.push({name:'impact-tone'});audio.impact('dragon');assert.equal(events[0].options.volume,.4);assert.equal(events[1].options.volume,1.6);assert.equal(events[1].options.pitch,2**(.5));assert.equal(events[2].name,'rock');assert.equal(events[3].name,'impact-tone')});
+test('mezcla de monedas reduce la normal, duplica x5 y usa rock para piedra y dragón',()=>{const audio=new GameAudio(),events=[];audio.sample=(name,options)=>events.push({name,options});audio.coin();audio.coin(5);audio.impact('stone');audio.tone=()=>events.push({name:'impact-tone'});audio.impact('dragon');assert.equal(events[0].options.volume,.4);assert.equal(events[1].options.volume,1.6);assert.equal(events[1].options.pitch,2**(.5));assert.equal(events[2].name,'rock');assert.equal(events[3].name,'rock');assert.equal(events[3].options.pitch,2**(4/12));assert.equal(events[3].options.volume,.7)});
 
 test('moneda x5 sube seis semitonos y Begin Rage duplica ganancia sin afectar End',()=>{const audio=new GameAudio(),sources=[],gains=[];audio.context={state:'running',createBufferSource(){const source={playbackRate:{value:1},connect(){},start(){},disconnect(){}};sources.push(source);return source},createGain(){const gain={gain:{value:0},connect(){},disconnect(){}};gains.push(gain);return gain}};audio.master={};audio.buffers={coin:{},beginRage:{},endRage:{}};audio.coin();audio.coin(5);audio.transform();audio.endRage();assert.equal(sources[0].playbackRate.value,1);assert.equal(sources[1].playbackRate.value,2**(6/12));assert.equal(gains[2].gain.value,1.6);assert.equal(gains[3].gain.value,.8)});
 
@@ -41,3 +41,4 @@ test('Rage cruza música sin reiniciar el ambiente; pausa conserva ambas posicio
 });
 
 test('roll usa el doble de ganancia sin cambiar su tono',()=>{const a=new GameAudio(),events=[];a.sample=(name,options)=>events.push({name,options});a.roll();assert.equal(events[0].name,'roll');assert.equal(events[0].options.volume,1.6);assert.equal(events[0].options.pitch,undefined)});
+
